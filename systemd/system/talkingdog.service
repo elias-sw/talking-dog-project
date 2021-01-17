@@ -1,0 +1,17 @@
+[Unit]
+Description=The talking dog project service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+WorkingDirectory=/home/pi/talkingdog
+User=pi
+StandardOutput=syslog+console
+ExecStart=/home/pi/talkingdog/talkingdog
+#ExecStart=start-stop-daemon --start --name talkingdog --background -d /home/pi/talkingdog --chuid pi --startas /home/pi/talkingdog/talkingdog -- 
+
+[Install]
+WantedBy=multi-user.target
