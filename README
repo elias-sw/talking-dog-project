@@ -1,1 +1,1 @@
-ffmpeg -i sounds/leka.mp3 sounds/leka.wav
+To configure the software, edit file config.py. There are further instructions.

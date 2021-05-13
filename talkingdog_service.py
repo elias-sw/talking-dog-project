@@ -5,15 +5,21 @@ from threading import Timer
 from time import sleep
 from enum import Enum
 import pygame
+import datetime
+
+import config
 
 DELAY = 0.02
 
 class DogButton:
-	def __init__(self, pin, soundfile):
+	def __init__(self, pin, soundfile, text):
 		self.pin = pin
 		self.soundfile = 'sounds/'+soundfile
 		self.sound = pygame.mixer.Sound(self.soundfile)
+		self.text = text
 
+# States for the push button state machine. Four states are needed because of debouncing.
+                
 class State(Enum):
 	Off = 0
 	On = 1
@@ -21,6 +27,8 @@ class State(Enum):
 	PerhapsOff = 3
 
 class TalkingDog:
+	buttons = []
+
 	def __enter__(self):
 		GPIO.setwarnings(False)
 
@@ -31,11 +39,9 @@ class TalkingDog:
 		# a DogButton object is created).
 		pygame.init()
 
-		# Define the pin <-> sound mapping.
-		self.buttons = [
-			DogButton(10, 'leka.wav'),
-			DogButton(12, 'hallahalla.wav')
-		]
+		# Load the pin <-> sound mapping.
+		for bs in config.button_sounds:
+			self.buttons.append(DogButton(bs[0], bs[1], bs[2]))
 
 		for button in self.buttons:
 			# Set the pin to be an input and set initial value to be pulled low (off).
@@ -51,15 +57,28 @@ class TalkingDog:
 		self.n_button_presses = 0
 		self.state = State.Off
 
+                # Log file for this application.
+		self.log_file = open("talkingdog.log","w")
+		self.log_file.write(f"Started.\n")
+
+                # The button press list.
+		self.html_file = open("presses.html","a")
+
 	def __exit__(self, type, value, tb):
 		GPIO.cleanup()
+		self.log_file.close()
+		self.html_file.close()
+
 
 	# Find the button object for a specified pin.
 
 	def find_button(self, pin):
 		return [button for button in self.buttons if button.pin == pin][0]
 
+
 	# Called when there is a rising or falling edge on a button input.
+        # For a rising/falling edge to be judged as a real button press/release it has to
+        # be up/down for at least DELAY seconds.
 
 	def button_callback(self, pin):
 		if self.state == State.Off:
@@ -81,7 +100,8 @@ class TalkingDog:
 				self.timer.cancel()
 				self.state = State.On
 		else:
-			print('ERROR: Unknown state!')
+			self.log_file.write('ERROR: Unknown state!')
+
 
 	# Called when the timer times out.
 	
@@ -93,19 +113,29 @@ class TalkingDog:
 		elif self.state == State.PerhapsOff:
 			self.state = State.Off
 		else:
-			print('ERROR! Timeout should not occur in state '+self.state+'.')
+			self.log_file.write('ERROR! Timeout should not occur in state '+self.state+'.')
+
 
 	# Returns the current hardware state of a button.
 
 	def button_state_on(self, pin):
 		return GPIO.input(pin)
 
+
 	# When a button is determined to be pressed, this is called.
 	
 	def button_pressed(self, pin):
-		print(f'<<< {self.n_button_presses} BUTTON {pin} PRESSED >>>')
-		self.find_button(pin).sound.play()
+		self.log_file.write(f'<<< {self.n_button_presses} BUTTON {pin} PRESSED >>>')
+		button = self.find_button(pin)
+		button.sound.play()
 
+		timestamp = datetime.datetime.now().replace(microsecond=0).isoformat(' ')
+
+		self.log_file.write(f"{timestamp} Played {button.soundfile}: {button.text}\n")
+		self.log_file.flush()
+
+		self.html_file.write(f"<tr><td>{timestamp}</td><td>{button.text}</td></tr>\n")
+		self.html_file.flush()
 	
 with TalkingDog() as talking_dog:
 	while True:

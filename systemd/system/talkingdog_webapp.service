@@ -1,0 +1,17 @@
+[Unit]
+Description=The talking dog webapp service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+WorkingDirectory=/home/pi/talkingdog
+User=root
+StandardOutput=syslog+console
+ExecStart=/home/pi/talkingdog/talkingdog_webapp.py
+#ExecStart=start-stop-daemon --start --name talkingdog --background -d /home/pi/talkingdog --chuid root --startas /home/pi/talkingdog/talkingdog_webapp.py -- 
+
+[Install]
+WantedBy=multi-user.target

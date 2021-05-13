@@ -10,8 +10,8 @@ RestartSec=1
 WorkingDirectory=/home/pi/talkingdog
 User=pi
 StandardOutput=syslog+console
-ExecStart=/home/pi/talkingdog/talkingdog
-#ExecStart=start-stop-daemon --start --name talkingdog --background -d /home/pi/talkingdog --chuid pi --startas /home/pi/talkingdog/talkingdog -- 
+ExecStart=/home/pi/talkingdog/talkingdog_service.py
+#ExecStart=start-stop-daemon --start --name talkingdog --background -d /home/pi/talkingdog --chuid pi --startas /home/pi/talkingdog/talkingdog_service.py -- 
 
 [Install]
 WantedBy=multi-user.target
