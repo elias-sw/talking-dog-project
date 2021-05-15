@@ -134,7 +134,7 @@ class TalkingDog:
 		self.log_file.write(f"{timestamp} Played {button.soundfile}: {button.text}\n")
 		self.log_file.flush()
 
-		self.html_file.write(f"<tr><td>{timestamp}</td><td>{button.text}</td></tr>\n")
+		self.html_file.write(f'<tr><td class="timestamp-td">{timestamp}</td><td class="text-td">{button.text}</td></tr>\n')
 		self.html_file.flush()
 	
 with TalkingDog() as talking_dog:
