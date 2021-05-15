@@ -1,4 +1,9 @@
 To configure the software, edit file config.py. There are further instructions.
 
+You may also want to change the timezone to get the times in the log right:
+$ sudo timedatectl set-timezone <your timezone>
+where <your timezone> can be found by:
+$ timedatectl list-timezones
+
 All information about the project is on the Thingiverse page: https://www.thingiverse.com/thing:4737780
 
