@@ -7,6 +7,8 @@ $ sudo timedatectl set-timezone <your timezone>
 where <your timezone> can be found by:
 $ timedatectl list-timezones
 
+Configure WiFi by editing /etc/wpa_supplicant/wpa_supplicant.conf.
+
 There are two services that need to run:
 
 talkingdog_service.py - This process handles button presses and playing sounds.
